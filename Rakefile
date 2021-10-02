@@ -10,3 +10,7 @@ require "rubocop/rake_task"
 RuboCop::RakeTask.new
 
 task default: %i[spec rubocop]
+
+task :run do
+  ruby "lib/chip8.rb #{ENV["rom"]}"
+end

@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "CHIP-8 emulator in Ruby."
   spec.description   = "CHIP-8 emulator in Ruby."
   spec.homepage      = "https://github.com/j-seixas/chip-8"
-  spec.required_ruby_version = ">= 2.4.0"
+  spec.required_ruby_version = ">= 3.0"
 
   spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
