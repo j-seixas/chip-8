@@ -13,7 +13,8 @@ module Chip8
 
     def initialize
       @i = @pc = 0x0000
-      @v = @sp = @dt = @st = 0x00
+      @sp = @dt = @st = 0x00
+      @v = Array.new 16, 0x00
     end
 
     def start_rom
@@ -21,10 +22,16 @@ module Chip8
     end
 
     def run(mem)
-      opcode = mem.instruction(@pc)
-      op = Opcode.decode(opcode)
-      send(op) # Execute op
-      inc_pc
+      loop do
+        opcode = mem.instruction(@pc)
+        op = Opcode.new(opcode).decode
+        send(*op) # Execute op
+        puts "PC: #{@pc}"
+        puts "V reg: #{@v}"
+        puts "I reg: #{@i}"
+        puts "=============="
+        inc_pc
+      end
     end
 
     def inc_pc
