@@ -7,7 +7,100 @@ module Chip8
 
     def initialize(opcode)
       @opcode = opcode & 0xFFFF
-      @operations = {
+      @operations = operations
+    end
+
+    def decode
+      op =
+        case msb
+        when 0x0 then decode_0
+        when 0x1 then :op_1nnn
+        when 0x2 then :op_2nnn
+        when 0x3 then :op_3xkk
+        when 0x4 then :op_4xkk
+        when 0x6 then :op_6xkk
+        when 0x7 then :op_7xkk
+        when 0x8 then decode_8
+        when 0x9 then :op_9xy0
+        when 0xA then :op_annn
+        when 0xB then :op_bnnn
+        when 0xC then :op_cxkk
+        when 0xD then :op_dxyn
+        when 0xE then decode_e
+        when 0xF then decode_f
+        end
+
+      raise OpcodeError.new, "Invalid opcode #{@opcode} | hex: #{@opcode.to_s(16)}" if op.nil?
+
+      @operations[op]
+    end
+
+    private
+
+    def msb
+      (@opcode & 0xF000) >> 12
+    end
+
+    def x
+      (@opcode & 0x0F00) >> 8
+    end
+
+    def y
+      (@opcode & 0x00F0) >> 4
+    end
+
+    def kk
+      @opcode & 0x00FF
+    end
+
+    def nnn
+      @opcode & 0x0FFF
+    end
+
+    def n
+      @opcode & 0x000F
+    end
+
+    def decode_0
+      case @opcode
+      when 0x00E0 then :op_00e0
+      when 0x00EE then :op_00ee
+      else
+        :op_0nnn
+      end
+    end
+
+    def decode_8
+      case n
+      when 0x0 then :op_8xy0
+      when 0x1 then :op_8xy1
+      when 0x2 then :op_8xy2
+      when 0x3 then :op_8xy3
+      when 0x4 then :op_8xy4
+      when 0x5 then :op_8xy5
+      when 0x6 then :op_8xy6
+      when 0x7 then :op_8xy7
+      when 0xE then :op_8xye
+      end
+    end
+
+    def decode_e
+      case kk
+      when 0x9E then :op_ex9e
+      when 0xA1 then :op_exa1
+      end
+    end
+
+    def decode_f
+      case kk
+      when 0x1E then :op_fx1e
+      when 0x55 then :op_fx55
+      when 0x65 then :op_fx65
+      end
+    end
+
+    def operations
+      {
         op_0nnn: ["sys", nnn],
         op_00e0: ["cls"],
         op_00ee: ["ret"],
@@ -37,101 +130,6 @@ module Chip8
         op_fx55: ["store_regs", x],
         op_fx65: ["read_regs", x]
       }
-    end
-
-    def decode
-      case @opcode & 0xF000
-      when 0x0000
-        case @opcode
-        when 0x00E0
-          return @operations[:op_00e0]
-        when 0x00EE
-          return @operations[:op_00ee]
-        else
-          return @operations[:op_0nnn]
-        end
-      when 0x1000
-        return @operations[:op_1nnn]
-      when 0x2000
-        return @operations[:op_2nnn]
-      when 0x3000
-        return @operations[:op_3xkk]
-      when 0x4000
-        return @operations[:op_4xkk]
-      when 0x6000
-        return @operations[:op_6xkk]
-      when 0x7000
-        return @operations[:op_7xkk]
-      when 0x8000
-        case @opcode & 0x000F
-        when 0x0000
-          return @operations[:op_8xy0]
-        when 0x0001
-          return @operations[:op_8xy1]
-        when 0x0002
-          return @operations[:op_8xy2]
-        when 0x0003
-          return @operations[:op_8xy3]
-        when 0x0004
-          return @operations[:op_8xy4]
-        when 0x0005
-          return @operations[:op_8xy5]
-        when 0x0006
-          return @operations[:op_8xy6]
-        when 0x0007
-          return @operations[:op_8xy7]
-        when 0x000e
-          return @operations[:op_8xye]
-        end
-      when 0x9000
-        return @operations[:op_9xy0]
-      when 0xa000
-        return @operations[:op_annn]
-      when 0xb000
-        return @operations[:op_bnnn]
-      when 0xc000
-        return @operations[:op_cxkk]
-      when 0xd000
-        return @operations[:op_dxyn]
-      when 0xE000
-        case @opcode & 0x00FF
-        when 0x009E
-          return @operations[:op_ex9e]
-        when 0x00A1
-          return @operations[:op_exa1]
-        end
-      when 0xF000
-        case @opcode & 0x00FF
-        when 0x001E
-          return @operations[:op_fx1e]
-        when 0x0055
-          return @operations[:op_fx55]
-        when 0x0065
-          return @operations[:op_fx65]
-        end
-      end
-
-      raise OpcodeError.new, "Invalid opcode #{@opcode} | hex: #{@opcode.to_s(16)}"
-    end
-
-    def x
-      (@opcode & 0x0F00) >> 8
-    end
-
-    def y
-      (@opcode & 0x00F0) >> 4
-    end
-
-    def kk
-      @opcode & 0x00FF
-    end
-
-    def nnn
-      @opcode & 0x0FFF
-    end
-
-    def n
-      @opcode & 0x000F
     end
   end
 end

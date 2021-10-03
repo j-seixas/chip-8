@@ -3,7 +3,7 @@
 require "gosu"
 
 module Chip8
-  # Display logic of Chip-8
+  # Display logic
   class Display < Gosu::Window
     WIDTH = 64
     HEIGHT = 32
