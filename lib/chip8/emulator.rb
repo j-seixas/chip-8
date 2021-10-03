@@ -7,12 +7,11 @@ module Chip8
       rom_bytes = File.open(rom, "rb", &:read).unpack("C*")
       @mem = Chip8::Memory.new
       @mem.load_rom(rom_bytes)
-      @cpu = Chip8::CPU.new
+      @cpu = Chip8::CPU.new(@mem)
     end
 
     def run
-      @cpu.start_rom
-      @cpu.run(@mem)
+      @cpu.run
     end
   end
 end

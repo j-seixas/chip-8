@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "byebug"
+
 module Chip8
   # CPU logic of Chip-8
   class CPU
@@ -10,25 +12,31 @@ module Chip8
     attr_reader :v, :sp, :dt, :st
     # 16-bit registers
     attr_reader :i, :pc
+    attr_reader :stack
 
-    def initialize
+    def initialize(memory)
       @i = @pc = 0x0000
       @sp = @dt = @st = 0x00
       @v = Array.new 16, 0x00
+      @stack = Array.new 16, 0x0000
+      @memory = memory
+      start_rom
     end
 
     def start_rom
       @pc = ROM_START & 0xFFFF
     end
 
-    def run(mem)
+    def run
       loop do
-        opcode = mem.instruction(@pc)
+        opcode = @memory.instruction(@pc)
+        puts "opcode: #{opcode.to_s(16)}"
         op = Opcode.new(opcode).decode
         send(*op) # Execute op
-        puts "PC: #{@pc}"
+        puts "PC: #{@pc.to_s(16)}"
         puts "V reg: #{@v}"
         puts "I reg: #{@i}"
+        puts "SP: #{@sp} | stack: #{@stack}"
         puts "=============="
         inc_pc
       end
