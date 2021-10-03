@@ -8,10 +8,14 @@ module Chip8
       @mem = Chip8::Memory.new
       @mem.load_rom(rom_bytes)
       @cpu = Chip8::CPU.new(@mem)
+      @display = Chip8::Display.new
     end
 
     def run
-      @cpu.run
+      Thread.new do
+        @cpu.run
+      end
+      @display.show
     end
   end
 end

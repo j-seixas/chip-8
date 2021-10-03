@@ -6,5 +6,6 @@ require_relative "chip8/memory"
 require_relative "chip8/operations"
 require_relative "chip8/opcode"
 require_relative "chip8/cpu"
+require_relative "chip8/display"
 
 Chip8::Emulator.new(ARGV[0]).run
