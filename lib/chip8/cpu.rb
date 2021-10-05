@@ -14,12 +14,13 @@ module Chip8
     attr_reader :i, :pc
     attr_reader :stack
 
-    def initialize(memory)
+    def initialize(memory, display)
       @i = @pc = 0x0000
       @sp = @dt = @st = 0x00
       @v = Array.new 16, 0x00
       @stack = Array.new 16, 0x0000
       @memory = memory
+      @display = display
       start_rom
     end
 
@@ -33,10 +34,10 @@ module Chip8
         puts "opcode: #{opcode.to_s(16)}"
         op = Opcode.new(opcode).decode
         send(*op) # Execute op
-        puts "PC: #{@pc.to_s(16)}"
-        puts "V reg: #{@v}"
-        puts "I reg: #{@i}"
-        puts "SP: #{@sp} | stack: #{@stack}"
+        # puts "PC: #{@pc.to_s(16)}"
+        # puts "V reg: #{@v}"
+        # puts "I reg: #{@i}"
+        # puts "SP: #{@sp} | stack: #{@stack}"
         puts "=============="
         inc_pc
       end
