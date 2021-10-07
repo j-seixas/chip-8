@@ -22,6 +22,8 @@ module Chip8
       @memory = memory
       @display = display
       @keyboard = @display.keyboard
+      @dt = @display.dt
+      @st = @display.st
       start_rom
     end
 

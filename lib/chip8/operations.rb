@@ -81,6 +81,16 @@ module Chip8
     end
 
     #
+    # 5xy0 - SE Vx, Vy
+    #
+    # Skip next instruction if Vx = Vy.
+    # The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
+    #
+    def se_vx_vy(x, y)
+      @pc = (@pc + 2) & 0xFFFF if @v[x] == @v[y]
+    end
+
+    #
     # 6xkk - LD Vx, byte
     #
     # Set Vx = kk.
@@ -283,6 +293,16 @@ module Chip8
     end
 
     #
+    # Fx07 - LD Vx, DT
+    #
+    # Set Vx = delay timer value.
+    # The value of DT is placed into Vx.
+    #
+    def ld_vx_delay(x)
+      @v[x] = @dt
+    end
+
+    #
     # Fx0A - LD Vx, K
     # 
     # Wait for a key press, store the value of the key in Vx.
@@ -294,6 +314,26 @@ module Chip8
       else
         @pc = (@pc - 2) & 0xFFFF
       end
+    end
+
+    #
+    # Fx15 - LD DT, Vx
+    #
+    # Set delay timer = Vx.
+    # DT is set equal to the value of Vx.
+    #
+    def ld_delay_vx(x)
+      @dt = @v[x]
+    end
+
+    #
+    # Fx18 - LD ST, Vx
+    #
+    # Set sound timer = Vx.
+    # ST is set equal to the value of Vx.
+    #
+    def ld_sound_vx(x)
+      @st = @v[x]
     end
 
     #

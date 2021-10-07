@@ -9,13 +9,15 @@ module Chip8
     HEIGHT = 32
     DEFAULT_SCALE = 20
 
-    attr_reader :keyboard
+    attr_accessor :keyboard, :dt, :st
 
     def initialize(scale = nil, black = nil, white = nil)
       @scale = scale || DEFAULT_SCALE
       @black = map_color(black || "black")
       @white = map_color(white || "white")
       @keyboard = Keyboard.new
+      @dt = @st = 0x00
+      @beep = Gosu::Sample.new("sound/beep.wav")
       super @scale * WIDTH, @scale * HEIGHT
       clear_screen
     end
@@ -26,6 +28,14 @@ module Chip8
         y = (index / WIDTH).to_i
         draw_rect(x * @scale, y * @scale, @scale, @scale, value == 1 ? @white : @black)
       end
+    end
+
+    def update
+      if @st.positive?
+        @beep.play
+        @st -= 1
+      end
+      @dt -= 1 if @dt.positive?
     end
 
     def button_down(id)

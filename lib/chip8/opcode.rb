@@ -18,6 +18,7 @@ module Chip8
         when 0x2 then :op_2nnn
         when 0x3 then :op_3xkk
         when 0x4 then :op_4xkk
+        when 0x5 then :op_5xy0
         when 0x6 then :op_6xkk
         when 0x7 then :op_7xkk
         when 0x8 then decode_8
@@ -93,7 +94,10 @@ module Chip8
 
     def decode_f
       case kk
+      when 0x07 then :op_fx07
       when 0x0A then :op_fx0a
+      when 0x15 then :op_fx15
+      when 0x18 then :op_fx18
       when 0x1E then :op_fx1e
       when 0x29 then :op_fx29
       when 0x33 then :op_fx33
@@ -111,6 +115,7 @@ module Chip8
         op_2nnn: ["call", nnn],
         op_3xkk: ["se", x, kk],
         op_4xkk: ["sne", x, kk],
+        op_5xy0: ["se_vx_vy", x, y],
         op_6xkk: ["ld_v", x, kk],
         op_7xkk: ["add_vx", x, kk],
         op_8xy0: ["ld_vx_vy", x, y],
@@ -129,7 +134,10 @@ module Chip8
         op_dxyn: ["drw", x, y, n],
         op_ex9e: ["skp", x],
         op_exa1: ["sknp", x],
+        op_fx07: ["ld_vx_delay", x],
         op_fx0a: ["wait_key", x],
+        op_fx15: ["ld_delay_vx", x],
+        op_fx18: ["ld_sound_vx", x],
         op_fx1e: ["add_i_vx", x],
         op_fx29: ["ld_i_sprite", x],
         op_fx33: ["store_decimal", x],
