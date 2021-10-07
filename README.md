@@ -7,8 +7,8 @@ Chip-8 Emulator written in Ruby.
 - [x] CPU
 - [x] Opcodes
 - [ ] Display + display opcodes
-- [ ] Keyboard + keyboard opcodes
-- [ ] Sound + sound opcodes
+- [x] Keyboard + keyboard opcodes
+- [ ] Timers + sound opcodes
 
 ## Usage
 

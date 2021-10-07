@@ -5,6 +5,7 @@ module Chip8
   class Memory
     MEMORY_SIZE = 4096
     ROM_OFFSET = 0x200
+    SPRITES_OFFSET = 0x0
 
     SPRITES = [
       0xF0, 0x90, 0x90, 0x90, 0xF0, # 0
@@ -32,7 +33,7 @@ module Chip8
 
     def load_sprites
       SPRITES.each_with_index do |byte, i|
-        @mem[i] = byte
+        @mem[SPRITES_OFFSET + i] = byte
       end
     end
 
@@ -47,7 +48,7 @@ module Chip8
     end
 
     def write(index, value)
-      @mem[index] = value
+      @mem[index] = value & 0xFF
     end
 
     def read(index)

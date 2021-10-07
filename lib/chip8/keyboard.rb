@@ -15,6 +15,15 @@ module Chip8
       @keys[index - 1] = is_key_down
     end
 
+    def key_down?(index)
+      @keys[index - 1]
+    end
+
+    def any_key_down?
+      key = @keys.find_index(true)
+      key + 1 if key
+    end
+
     def map_gosu_key(key)
       case key
       when Gosu::Kb1 then 0x1

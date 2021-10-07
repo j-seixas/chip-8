@@ -93,7 +93,10 @@ module Chip8
 
     def decode_f
       case kk
+      when 0x0A then :op_fx0a
       when 0x1E then :op_fx1e
+      when 0x29 then :op_fx29
+      when 0x33 then :op_fx33
       when 0x55 then :op_fx55
       when 0x65 then :op_fx65
       end
@@ -126,7 +129,10 @@ module Chip8
         op_dxyn: ["drw", x, y, n],
         op_ex9e: ["skp", x],
         op_exa1: ["sknp", x],
+        op_fx0a: ["wait_key", x],
         op_fx1e: ["add_i_vx", x],
+        op_fx29: ["ld_i_sprite", x],
+        op_fx33: ["store_decimal", x],
         op_fx55: ["store_regs", x],
         op_fx65: ["read_regs", x]
       }

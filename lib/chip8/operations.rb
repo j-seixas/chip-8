@@ -19,7 +19,7 @@ module Chip8
     # Clear the display.
     #
     def cls
-      # TODO: clear the display
+      @display.clear_screen
     end
 
     #
@@ -269,7 +269,7 @@ module Chip8
     # Skip next instruction if key with the value of Vx is pressed.
     # Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
     def skp(x)
-      # TODO: keyboard
+      @pc = (@pc + 2) & 0xFFFF if @keyboard.key_down?(@v[x] & 0xF)
     end
 
     #
@@ -279,7 +279,21 @@ module Chip8
     # Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
     #
     def sknp(x)
-      # TODO: keyboard
+      @pc = (@pc + 2) & 0xFFFF unless @keyboard.key_down?(@v[x] & 0xF)
+    end
+
+    #
+    # Fx0A - LD Vx, K
+    # 
+    # Wait for a key press, store the value of the key in Vx.
+    # All execution stops until a key is pressed, then the value of that key is stored in Vx.
+    def wait_key(x)
+      key = @keyboard.any_key_down?
+      if key
+        @v[x] = key & 0xFF
+      else
+        @pc = (@pc - 2) & 0xFFFF
+      end
     end
 
     #
@@ -290,6 +304,28 @@ module Chip8
     #
     def add_i_vx(x)
       @i = (@i + @v[x]) & 0xFFFF
+    end
+
+    #
+    # Fx29 - LD F, Vx
+    #
+    # Set I = location of sprite for digit Vx.
+    # The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
+    #
+    def ld_i_sprite(x)
+      @i = Memory::SPRITES_OFFSET + @v[x] * 5
+    end
+
+    #
+    # Fx33 - LD B, Vx
+    #
+    # Store BCD representation of Vx in memory locations I, I+1, and I+2.
+    # The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.
+    #
+    def store_decimal(x)
+      @memory.write(@i, @v[x] / 100)
+      @memory.write(@i + 1, (@v[x] / 10) % 10)
+      @memory.write(@i + 2, @v[x] % 10)
     end
 
     #
