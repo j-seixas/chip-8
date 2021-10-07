@@ -21,6 +21,7 @@ module Chip8
       @stack = Array.new 16, 0x0000
       @memory = memory
       @display = display
+      @keyboard = @display.keyboard
       start_rom
     end
 
@@ -38,6 +39,7 @@ module Chip8
         # puts "V reg: #{@v}"
         # puts "I reg: #{@i}"
         # puts "SP: #{@sp} | stack: #{@stack}"
+        # puts "KBD: #{@keyboard.keys}"
         puts "=============="
         inc_pc
       end
