@@ -259,18 +259,18 @@ module Chip8
     # Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
     # The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites.
     def drw(x, y, n)
-      erased = 0x0
+      @v[0xF] = 0x0
       (0...n).each do |i|
         mem = @memory.read(@i + i)
 
         (0..7).each do |j|
+          next if (mem & (0x80 >> j)).zero?
+
           curr_pixel = @display.pixel_at(@v[x] + j, @v[y] + i)
-          pixel = curr_pixel.to_i ^ (mem >> (8 - j) & 0x1)
-          erased = 0x1 if curr_pixel == 0x1 && pixel.zero?
-          @display.set_pixel_at(@v[x] + j, @v[y] + i, pixel) if curr_pixel != pixel
+          @v[0xF] = 1 if curr_pixel == 0x1
+          @display.set_pixel_at(@v[x] + j, @v[y] + i, curr_pixel ^ 0x1)
         end
       end
-      @v[0xF] = erased
     end
 
     #

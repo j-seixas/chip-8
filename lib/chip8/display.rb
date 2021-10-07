@@ -19,7 +19,7 @@ module Chip8
       @dt = @st = 0x00
       @beep = Gosu::Sample.new("sound/beep.wav")
       super @scale * WIDTH, @scale * HEIGHT
-      clear_screen
+      @vram = Array.new(WIDTH * HEIGHT, 0x0)
     end
 
     def draw
@@ -59,9 +59,7 @@ module Chip8
     end
 
     def set_pixel_at(x, y, pixel)
-      return if y * WIDTH + x >= WIDTH * HEIGHT
-
-      @vram[y * WIDTH + x] = pixel
+      @vram[(y % HEIGHT) * WIDTH + (x % WIDTH)] = pixel
     end
 
     def map_color(color)
