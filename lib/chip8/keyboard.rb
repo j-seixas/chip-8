@@ -12,16 +12,15 @@ module Chip8
     end
 
     def set_key(index, is_key_down)
-      @keys[index - 1] = is_key_down
+      @keys[index] = is_key_down
     end
 
     def key_down?(index)
-      @keys[index - 1]
+      @keys[index]
     end
 
     def any_key_down?
-      key = @keys.find_index(true)
-      key + 1 if key
+      @keys.find_index(true)
     end
 
     def map_gosu_key(key)
