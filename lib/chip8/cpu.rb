@@ -22,6 +22,7 @@ module Chip8
       @memory = memory
       @display = display
       @keyboard = @display.keyboard
+      @clock = Chip8::Clock.new
       @dt = @display.dt
       @st = @display.st
       start_rom
@@ -32,9 +33,20 @@ module Chip8
     end
 
     def run
+      start_time = Time.now
       loop do
+        time_elapsed = Time.now - start_time
+        next unless time_elapsed >= @clock.cpu_clock
+
+        cycle
+
+        start_time = Time.now
+      end
+    end
+
+    def cycle
         opcode = @memory.instruction(@pc)
-        puts "opcode: #{opcode.to_s(16)}"
+      # puts "opcode: #{opcode.to_s(16)}"
         op = Opcode.new(opcode).decode
         send(*op) # Execute op
         # puts "PC: #{@pc.to_s(16)}"
@@ -42,9 +54,8 @@ module Chip8
         # puts "I reg: #{@i}"
         # puts "SP: #{@sp} | stack: #{@stack}"
         # puts "KBD: #{@keyboard.keys}"
-        puts "=============="
+      # puts "=============="
         inc_pc
-      end
     end
 
     def inc_pc

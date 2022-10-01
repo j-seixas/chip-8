@@ -15,6 +15,7 @@ module Chip8
       Thread.new do
         @cpu.run
       end
+
       @display.show
     end
   end
