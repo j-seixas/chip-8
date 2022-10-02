@@ -33,7 +33,7 @@ module Chip8
       @sp -= 1
       raise "Out of bounds sp: #{@sp}" if @sp.negative?
 
-      @pc = @stack[@sp] & 0xFFFF
+      @pc = @stack[@sp] & 0xFFF
     end
 
     #
@@ -43,7 +43,8 @@ module Chip8
     # The interpreter sets the program counter to nnn.
     #
     def jp(nnn)
-      @pc = nnn & 0xFFFF
+      @pc = nnn
+      @to_increment = false
     end
 
     #
@@ -54,11 +55,12 @@ module Chip8
     # The PC is then set to nnn.
     #
     def call(nnn)
-      @stack[@sp] = @pc & 0xFFFF
+      @stack[@sp] = @pc & 0xFFF
       @sp += 1
       raise "Out of bounds sp: #{@sp}" if @sp >= 16
 
-      @pc = nnn & 0xFFFF
+      @pc = nnn
+      @to_increment = false
     end
 
     #
@@ -186,9 +188,9 @@ module Chip8
     # Set Vx = Vx SHR 1.
     # If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
     def shr(x)
-      lsb = @v[x] & 1
+      lsb = @v[x] & 0x01
       @v[0xF] = lsb
-      @v[x] >>= 1
+      @v[x] = (@v[x] >> 1) & 0xFF
     end
 
     #
@@ -209,9 +211,9 @@ module Chip8
     # If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
     #
     def shl(x)
-      lsb = @v[x] & 1
-      @v[0xF] = lsb
-      @v[x] <<= 1
+      msb = (@v[x] >> 7) & 0x1
+      @v[0xF] = msb
+      @v[x] = (@v[x] << 1) & 0xFF
     end
 
     #
@@ -231,7 +233,7 @@ module Chip8
     # The value of register I is set to nnn.
     #
     def ld_i(nnn)
-      @i = nnn & 0xFFFF
+      @i = nnn
     end
 
     #
@@ -260,15 +262,21 @@ module Chip8
     # The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites.
     def drw(x, y, n)
       @v[0xF] = 0x0
+      pos_x = @v[x] % Chip8::Display::WIDTH
+      pos_y = @v[y] % Chip8::Display::HEIGHT
+
       (0...n).each do |i|
+        break if pos_y + i > Chip8::Display::HEIGHT
+
         mem = @memory.read(@i + i)
 
         (0..7).each do |j|
+          break if pos_x + j > Chip8::Display::WIDTH
           next if (mem & (0x80 >> j)).zero?
 
-          curr_pixel = @display.pixel_at(@v[x] + j, @v[y] + i)
+          curr_pixel = @display.pixel_at(pos_x + j, pos_y + i)
           @v[0xF] = 1 if curr_pixel == 0x1
-          @display.set_pixel_at(@v[x] + j, @v[y] + i, curr_pixel ^ 0x1)
+          @display.set_pixel_at(pos_x + j, pos_y + i, curr_pixel ^ 0x1)
         end
       end
     end
@@ -304,7 +312,7 @@ module Chip8
 
     #
     # Fx0A - LD Vx, K
-    # 
+    #
     # Wait for a key press, store the value of the key in Vx.
     # All execution stops until a key is pressed, then the value of that key is stored in Vx.
     def wait_key(x)
@@ -312,7 +320,7 @@ module Chip8
       if key
         @v[x] = key & 0xFF
       else
-        @pc = (@pc - 2) & 0xFFFF
+        @to_increment = false
       end
     end
 

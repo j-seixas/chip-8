@@ -16,7 +16,7 @@ module Chip8
 
     def initialize(memory, display)
       @i = @pc = 0x0000
-      @sp = @dt = @st = 0x00
+      @sp = 0x00
       @v = Array.new 16, 0x00
       @stack = Array.new 16, 0x0000
       @memory = memory
@@ -25,11 +25,12 @@ module Chip8
       @clock = Chip8::Clock.new
       @dt = @display.dt
       @st = @display.st
+      @to_increment = true
       start_rom
     end
 
     def start_rom
-      @pc = ROM_START & 0xFFFF
+      @pc = ROM_START & 0xFFF
     end
 
     def run
@@ -45,21 +46,37 @@ module Chip8
     end
 
     def cycle
-        opcode = @memory.instruction(@pc)
-      # puts "opcode: #{opcode.to_s(16)}"
-        op = Opcode.new(opcode).decode
-        send(*op) # Execute op
-        # puts "PC: #{@pc.to_s(16)}"
-        # puts "V reg: #{@v}"
-        # puts "I reg: #{@i}"
-        # puts "SP: #{@sp} | stack: #{@stack}"
-        # puts "KBD: #{@keyboard.keys}"
+      fetch
+      decode
+      execute
+      # puts "PC: #{@pc.to_s(16)}"
+      # puts "V reg: #{@v}"
+      # puts "I reg: #{@i}"
+      # puts "SP: #{@sp} | stack: #{@stack}"
+      # puts "KBD: #{@keyboard.keys}"
       # puts "=============="
-        inc_pc
+    end
+
+    def fetch
+      @instruction = @memory.instruction(@pc)
+      # puts "opcode: #{@instruction.to_s(16)}"
+    end
+
+    def decode
+      @operation = Opcode.new(@instruction).decode
+    end
+
+    def execute
+      send(*@operation)
+      inc_pc
     end
 
     def inc_pc
-      @pc = (@pc + 2) & 0xFFFF
+      if @to_increment
+        @pc = (@pc + 2) & 0xFFF
+      else
+        @to_increment = true
+      end
     end
   end
 end

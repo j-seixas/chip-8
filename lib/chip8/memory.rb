@@ -48,11 +48,11 @@ module Chip8
     end
 
     def write(index, value)
-      @mem[index] = value & 0xFF
+      @mem[index & 0xFFF] = value & 0xFF
     end
 
     def read(index)
-      @mem[index]
+      @mem[index & 0xFFF]
     end
   end
 end
