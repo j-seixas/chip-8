@@ -7,7 +7,7 @@ module Chip8
   class Display < Gosu::Window
     WIDTH = 64
     HEIGHT = 32
-    DEFAULT_SCALE = 20
+    DEFAULT_SCALE = 10
 
     attr_accessor :keyboard, :dt, :st
 
@@ -31,6 +31,7 @@ module Chip8
     end
 
     def update
+      # self.caption = "Chip8 - [FPS: #{Gosu.fps}]"
       if @st.positive?
         @beep.play
         @st -= 1

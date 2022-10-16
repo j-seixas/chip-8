@@ -9,7 +9,7 @@ module Chip8
     ROM_START = 0x200
 
     # 8-bit registers
-    attr_reader :v, :sp, :dt, :st
+    attr_reader :v, :sp
     # 16-bit registers
     attr_reader :i, :pc
     attr_reader :stack
@@ -23,8 +23,6 @@ module Chip8
       @display = display
       @keyboard = @display.keyboard
       @clock = Chip8::Clock.new
-      @dt = @display.dt
-      @st = @display.st
       @to_increment = true
       start_rom
     end

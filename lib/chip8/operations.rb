@@ -70,7 +70,7 @@ module Chip8
     # The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
     #
     def se(x, kk)
-      @pc = (@pc + 2) & 0xFFFF if @v[x] == kk
+      @pc = (@pc + 2) & 0xFFF if @v[x] == kk
     end
 
     #
@@ -79,7 +79,7 @@ module Chip8
     # Skip next instruction if Vx != kk.
     # The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2.
     def sne(x, kk)
-      @pc = (@pc + 2) & 0xFFFF if @v[x] != kk
+      @pc = (@pc + 2) & 0xFFF if @v[x] != kk
     end
 
     #
@@ -89,7 +89,7 @@ module Chip8
     # The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
     #
     def se_vx_vy(x, y)
-      @pc = (@pc + 2) & 0xFFFF if @v[x] == @v[y]
+      @pc = (@pc + 2) & 0xFFF if @v[x] == @v[y]
     end
 
     #
@@ -167,7 +167,7 @@ module Chip8
     def add_vx_vy(x, y)
       sum = @v[x] + @v[y]
       @v[x] = sum & 0xFF
-      @v[0xF] = 1 if sum > 255
+      @v[0xF] = sum > 255 ? 1 : 0
     end
 
     #
@@ -243,7 +243,7 @@ module Chip8
     # The program counter is set to nnn plus the value of V0.
     #
     def jp_v0(nnn)
-      jp((@v[0] + nnn) & 0xFFFF)
+      jp((@v[0] + nnn) & 0xFFF)
     end
 
     #
@@ -287,7 +287,7 @@ module Chip8
     # Skip next instruction if key with the value of Vx is pressed.
     # Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
     def skp(x)
-      @pc = (@pc + 2) & 0xFFFF if @keyboard.key_down?(@v[x] & 0xF)
+      @pc = (@pc + 2) & 0xFFF if @keyboard.key_down?(@v[x] & 0xF)
     end
 
     #
@@ -297,7 +297,7 @@ module Chip8
     # Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
     #
     def sknp(x)
-      @pc = (@pc + 2) & 0xFFFF unless @keyboard.key_down?(@v[x] & 0xF)
+      @pc = (@pc + 2) & 0xFFF unless @keyboard.key_down?(@v[x] & 0xF)
     end
 
     #
@@ -307,7 +307,7 @@ module Chip8
     # The value of DT is placed into Vx.
     #
     def ld_vx_delay(x)
-      @v[x] = @dt
+      @v[x] = @display.dt
     end
 
     #
@@ -331,7 +331,7 @@ module Chip8
     # DT is set equal to the value of Vx.
     #
     def ld_delay_vx(x)
-      @dt = @v[x]
+      @display.dt = @v[x]
     end
 
     #
@@ -341,7 +341,7 @@ module Chip8
     # ST is set equal to the value of Vx.
     #
     def ld_sound_vx(x)
-      @st = @v[x]
+      @display.st = @v[x]
     end
 
     #
@@ -351,7 +351,7 @@ module Chip8
     # The values of I and Vx are added, and the results are stored in I.
     #
     def add_i_vx(x)
-      @i = (@i + @v[x]) & 0xFFFF
+      @i = (@i + @v[x]) & 0xFFF
     end
 
     #
