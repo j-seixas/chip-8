@@ -9,14 +9,14 @@ module Chip8
     HEIGHT = 32
     DEFAULT_SCALE = 10
 
-    attr_accessor :keyboard, :dt, :st
+    attr_accessor :keyboard
 
-    def initialize(scale = nil, black = nil, white = nil)
+    def initialize(clock, scale = nil, black = nil, white = nil)
+      @clock = clock
       @scale = scale || DEFAULT_SCALE
       @black = map_color(black || "black")
       @white = map_color(white || "white")
       @keyboard = Keyboard.new
-      @dt = @st = 0x00
       @beep = Gosu::Sample.new("sound/beep.wav")
       super @scale * WIDTH, @scale * HEIGHT
       @vram = Array.new(WIDTH * HEIGHT, 0x0)
@@ -32,11 +32,11 @@ module Chip8
 
     def update
       # self.caption = "Chip8 - [FPS: #{Gosu.fps}]"
-      if @st.positive?
+      if @clock.sound_timer.positive?
         @beep.play
-        @st -= 1
+        @clock.sound_timer -= 1
       end
-      @dt -= 1 if @dt.positive?
+      @clock.delay_timer -= 1 if @clock.delay_timer.positive?
     end
 
     def button_down(id)

@@ -307,7 +307,7 @@ module Chip8
     # The value of DT is placed into Vx.
     #
     def ld_vx_delay(x)
-      @v[x] = @display.dt
+      @v[x] = @clock.delay_timer
     end
 
     #
@@ -331,7 +331,7 @@ module Chip8
     # DT is set equal to the value of Vx.
     #
     def ld_delay_vx(x)
-      @display.dt = @v[x]
+      @clock.delay_timer = @v[x]
     end
 
     #
@@ -341,7 +341,7 @@ module Chip8
     # ST is set equal to the value of Vx.
     #
     def ld_sound_vx(x)
-      @display.st = @v[x]
+      @clock.sound_timer = @v[x]
     end
 
     #

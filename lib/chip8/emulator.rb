@@ -7,8 +7,9 @@ module Chip8
       rom_bytes = File.open(rom, "rb", &:read).unpack("C*")
       @mem = Chip8::Memory.new
       @mem.load_rom(rom_bytes)
-      @display = Chip8::Display.new
-      @cpu = Chip8::CPU.new(@mem, @display)
+      @clock = Chip8::Clock.new
+      @display = Chip8::Display.new(@clock)
+      @cpu = Chip8::CPU.new(@mem, @display, @clock)
     end
 
     def run
