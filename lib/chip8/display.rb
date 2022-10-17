@@ -40,8 +40,14 @@ module Chip8
     end
 
     def button_down(id)
-      mapped_key = @keyboard.map_gosu_key(id)
-      @keyboard.set_key(mapped_key, true) if mapped_key
+      case id
+      when Gosu::KB_UP then @clock.increase_cpu_speed
+      when Gosu::KB_DOWN then @clock.decrease_cpu_speed
+      when Gosu::KB_ESCAPE then close
+      else
+        mapped_key = @keyboard.map_gosu_key(id)
+        @keyboard.set_key(mapped_key, true) if mapped_key
+      end
       super
     end
 

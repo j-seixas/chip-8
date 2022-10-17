@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "byebug"
-
 module Chip8
   # CPU logic of Chip-8
   class CPU
@@ -34,6 +32,8 @@ module Chip8
     def run
       start_time = Time.now
       loop do
+        break if @clock.cpu_stopped
+
         time_elapsed = Time.now - start_time
         next unless time_elapsed >= @clock.cpu_clock
 
